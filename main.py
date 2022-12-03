@@ -1,90 +1,96 @@
+from client import ClientTable
 import sqlite3 as sl
 
-class ClientTable:
-    def __init__(self):
+def retornar():
+    print('Aperte C para voltar para tela de cadastro e V para voltar para a tela inicial:')
+    flag_voltar = input()
+    if flag_voltar.upper() == 'V':
+        return True
+    else:
+        return False
 
-        self.con = sl.connect('cinema_data.db')
-        self.cur = self.con.cursor()
-        self.cur.execute("""
-        CREATE TABLE if not exists CLIENTE (
-            id_cliente integer PRIMARY KEY autoincrement,
-            nome varchar(90) NOT NULL
-        )
-        """)
+def tela_cadastro(table):
 
-    def create(self,name):
+    while(True):
 
-        try:
-            self.cur.execute(f"INSERT INTO CLIENTE(nome) VALUES('{name}')")
-            print(f"Cliente {name} cadastrado com sucesso")
-        except:
-            print("Não foi possível cadastrar o cliente")
+        print('Bem-vindo/a à tela de cadastro de clientes, você gostaria de se cadastrar (C), checar seu cadastro (R), atualizar seu cadastro (U) ou deletar seu cadastro (D)?')
+        flag_cadastro = input()
 
-    def read(self,name):
+        if flag_cadastro.upper() == 'C':
 
-        data = self.cur.execute(f"SELECT * FROM CLIENTE WHERE nome == '{name}'")
-        ret_vals = data.fetchall()
-        if not ret_vals:
-            print(f"Nenhum cliente encontrado com nome {name}")
-        else:
-            for row in ret_vals:
-                print(f"ID: {row[0]}, Nome do cliente: {row[1]}")
-    
-    def read_all(self):
-        data = self.cur.execute(f"SELECT * FROM CLIENTE")
-        ret_vals = data.fetchall()
-        if not ret_vals:
-            print(f"Nenhum cliente encontrado")
-        else:
-            for row in ret_vals:
-                print(f"ID: {row[0]}, Nome do cliente: {row[1]}")
-    
-    def update(self, name='', id=0, new_name=''):
+            print('Digite o seu nome para se cadastrar: ')
+            nome = input()
+            table.create(nome)
 
-        if name:
-            data = self.cur.execute(f"UPDATE CLIENTE SET nome = '{new_name}' WHERE nome == '{name}'")
-            print(f'Cliente {name} trocado para {new_name}')
-        elif id:
-            data = self.cur.execute(f"UPDATE CLIENTE SET nome = '{new_name}' WHERE id_cliente == '{id}'")
-            print(f'Cliente de id {id} trocado para {new_name}')
-        else:
-            print("Nao foi possivel atualizar as informacoes do cliente")
-    
-    def delete(self, name='', id=0):
-
-        if name:
-            data = self.cur.execute(f"DELETE FROM CLIENTE WHERE nome == '{name}'")
-            print(f'Cliente(s) {name} deletado')
-        elif id:
-            data = self.cur.execute(f"DELETE FROM CLIENTE WHERE id_cliente == '{id}'")
-            print(f'Cliente com id {id} deletado')
-        else:
-            print("Nao foi possivel deletar o cliente")
+            if retornar():
+                break
+            else:
+                continue
             
-table = ClientTable()
 
-# Testando criação
-table.create('beto')
-table.create('lara')
+        elif flag_cadastro.upper() == 'R':
 
-# Testando leitura
-table.read('beto')
-table.read('lara')
-table.read('joaozinho')
+            print('Digite o nome do usuário que você deseja checar o cadastro')
+            nome = input()
+            table.read(name=nome)
 
-# Testando update
-table.update(name='lara',new_name='ponpon')
-table.update(id=1,new_name='bebeto')
-table.read('lara')
-table.read('beto')
-table.read('bebeto')
-table.read('ponpon')
+            if retornar():
+                break
+            else:
+                continue
 
-# Testando deleção
-table.read_all()
-table.delete('bebeto')
-table.delete(id=2)
-table.read_all()
+        elif flag_cadastro.upper() == 'U':
+        #Ideia para mais tarde: Checar se usuario existe
 
-#table.con.commit()
-table.con.close()
+            print('Digite o nome do usuário que você deseja atualizar:')
+            nome_antigo = input()
+            print('Digite o novo nome do usuário:')
+            nome_novo = input()
+            table.update(name=nome_antigo, new_name=nome_novo)
+
+            if retornar():
+                break
+            else:
+                continue
+
+        elif flag_cadastro.upper() == 'D':
+        #Ideia para mais tarde, checar se usuario existe
+
+            print('Digite o nome do usuário que você deseja deletar:')
+            nome = input()
+            table.delete(name=nome)
+
+            if retornar():
+                break
+            else:
+                continue
+
+
+def tela_compra():
+    pass
+
+if __name__ == '__main__':
+
+    tabela_cliente = ClientTable()
+
+    while(True):
+        print('Bem-vindo/a ao cinema nome do cinema! Você gostaria de ir para a tela de cadastro ou fazer uma compra?')
+        print('Digite C para se cadastrar, B para fazer uma compra ou E para sair da plataforma: ')
+        flag_1 = input()
+
+        if flag_1.upper() == 'C':
+            tela_cadastro(tabela_cliente)
+
+        elif flag_1.upper() == 'B':
+            tela_compra()
+
+        elif flag_1.upper() == 'E':
+            print('Obrigado por usar nossa plataforma! Até a próxima!')
+            break
+
+        else:
+            print('Input inválido digitado, aperte Enter para tentar novamente!')
+            _val = input()
+
+    tabela_cliente.con.commit()
+    tabela_cliente.con.close()
