@@ -15,7 +15,7 @@ class TicketTable:
         self.cur.execute("""
         CREATE TABLE if not exists CREATE TABLE ingresso (
             FOREIGN KEY (id_produto) REFERENCES produto(id_produto) PRIMARY KEY,
-            FOREIGN KEY (id_sessao) REFERENCES CRONOGRAMA (id_sessao),
+            FOREIGN KEY (id_sessao) REFERENCES programacao (id_sessao),
             data date NOT NULL,
             tipo_ingresso varchar(15) NOT NULL
         )

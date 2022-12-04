@@ -1,4 +1,4 @@
-from client import ClientTable
+from tables.client import ClientTable
 import sqlite3 as sl
 
 def retornar():
@@ -94,4 +94,3 @@ if __name__ == '__main__':
 
     tabela_cliente.con.commit()
     tabela_cliente.con.close()
-    

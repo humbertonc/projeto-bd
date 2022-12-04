@@ -30,6 +30,14 @@ class ScreenTable:
         else:
             return ret_vals
 
+    def read_all(self):
+        data = self.cur.execute(f"SELECT * FROM sala")
+        ret_vals = data.fetchall()
+        if not ret_vals:
+            print(f"Nenhuma sala encontrada\n")
+        else:
+            return ret_vals
+
 '''
 # Testando criação
 table.create(100)
@@ -38,6 +46,7 @@ table.create(70)
 # Testando leitura
 print(table.get_capacity(1))
 print(table.get_capacity(2))
+print(table.read_all())
 '''
 
 #table.con.commit()
