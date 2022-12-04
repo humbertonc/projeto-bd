@@ -10,7 +10,7 @@ class MovieTable:
             id_filme serial PRIMARY KEY,
             titulo varchar(90) NOT NULL,
             categoria varchar(90) NOT NULL,
-            duracao time NOT NULL,
+            duracao integer NOT NULL,
             censura char NOT NULL,
             nacional BOOLEAN
         )
@@ -65,7 +65,7 @@ class MovieTable:
     
 '''
 # Testando criação
-table.create('Esqueceram de mim', 'Comédia', '01:43:00', 'L', false, 1, [1, 2, 3])
+table.create('Esqueceram de mim', 'Comédia', 60*1 + 43, 'L', false, 1, [1, 2, 3])
 
 # Testando leitura
 table.read(1)
