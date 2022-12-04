@@ -58,14 +58,9 @@ table.create(15.50, 1, '2022-12-06', 'ESTUDANTE')
 table.create(7.75, 1, '2022-12-06', 'INFANTIL')
 
 # Testando leitura
-data = table.read(1)
-print(data)
-
-data = table.read(2)
-print(data)
-
-data = table.read_all()
-print(data)
+print(table.read(1))
+print(table.read(2))
+print(table.read_all())
 '''
 
 #table.con.commit()

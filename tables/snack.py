@@ -15,7 +15,7 @@ class SnackTable:
         self.cur.execute("""
         CREATE TABLE if not exists CREATE TABLE CREATE TABLE lanche (
             FOREIGN KEY (id_produto) REFERENCES produto (id_produto) PRIMARY KEY,
-            nome varchar(90) NOT NULL
+            nome_lanche varchar(90) NOT NULL
         )
         """)
 
@@ -24,7 +24,7 @@ class SnackTable:
         try:
             self.cur(f"INSERT INTO produto(cod_produto, preco) VALUES(2, {price})")
             id_product = self.cur("SELECT SCOPE_IDENTITY();")
-            self.cur.execute(f"""INSERT INTO lanche(id_produto, nome) 
+            self.cur.execute(f"""INSERT INTO lanche(id_produto, nome_lanche) 
             VALUES({id_product}, {name})""")
             print(f"Lanche cadastrado com sucesso")
         except:
@@ -33,24 +33,24 @@ class SnackTable:
 
     def read(self, name):
 
-        data = self.cur.execute(f"""SELECT (id_produto, nome, preco) 
-        FROM (produto JOIN lanche) WHERE nome == {name}""")
+        data = self.cur.execute(f"""SELECT (id_produto, nome_lanche, preco) 
+        FROM (produto JOIN lanche) WHERE nome_lanche == {name}""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum lanche encontrado com nome {name}\n")
         else:
             for row in ret_vals:
-                print(f"ID: {row[0]}, Nome do produto: {row[1]}, Preço do produto: {row[2]}\n")
+                print(f"ID: {row[0]}; Nome do produto: {row[1]}; Preço do produto: {row[2]}\n")
             return ret_vals
 
     def read_all(self):
-        data = self.cur.execute(f"SELECT (id_produto, nome, preco) FROM (produto JOIN lanche)")
+        data = self.cur.execute(f"SELECT (id_produto, nome_lanche, preco) FROM (produto JOIN lanche)")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum lanche encontrado")
         else:
             for row in ret_vals:
-                print(f"ID: {row[0]}, Nome do produto: {row[1]}, Preço do produto: {row[2]}")
+                print(f"ID: {row[0]}; Nome do produto: {row[1]}; Preço do produto: {row[2]}")
         print('')
         
 '''

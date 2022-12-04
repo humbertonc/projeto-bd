@@ -26,25 +26,25 @@ class VoucherTable:
 
     def read(self, id_voucher):
 
-        data = self.cur.execute(f"""SELECT (nome, quantidade, preco) 
+        data = self.cur.execute(f"""SELECT (nome_lanche, quantidade, preco) 
         FROM (produto JOIN lanche JOIN voucher) WHERE id_voucher == {id_voucher}""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum voucher encontrado com id {id_voucher}")
         else:
             for row in ret_vals:
-                print(f"Nome do produto: {row[0]}, Quantidade do produto: {row[1]}, Preço do produto: {row[2]}")
+                print(f"Nome do produto: {row[0]}; Quantidade do produto: {row[1]}; Preço do produto: {row[2]}")
         print('')
 
     def read_all(self):
-        data = self.cur.execute(f"""SELECT (id_voucher, nome, quantidade, preco) 
+        data = self.cur.execute(f"""SELECT (id_voucher, nome_lanche, quantidade, preco) 
         FROM (produto JOIN lanche JOIN voucher)""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum voucher encontrado")
         else:
             for row in ret_vals:
-                print(f"ID: {row[0]}, Nome do produto: {row[1]}, Quantidade do produto: {row[2]}, Preço do produto: {row[3]}")
+                print(f"ID: {row[0]}; Nome do produto: {row[1]}; Quantidade do produto: {row[2]}; Preço do produto: {row[3]}")
         print('')
 
     def read_last(self):
@@ -63,9 +63,7 @@ table.create(1, 2, 4)
 # Testando leitura
 table.read(1)
 table.read_all()
-
-data = read_last()
-print(data)
+print(read_last())
 '''
 
 #table.con.commit()
