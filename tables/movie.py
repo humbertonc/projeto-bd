@@ -50,23 +50,30 @@ class MovieTable:
 
     def read(self, id_movie):
 
-        data = self.cur.execute(f"""SELECT (titulo, categoria, duracao, censura, nacional, 
-        nome_produtora, nome_ator) FROM (filme JOIN filme_produtora JOIN filme_ator JOIN produtora JOIN ator) 
-        WHERE id_filme == {id_movie}""")
-        ret_vals = data.fetchall()
+        # Select movie and producer
+        movie_data = self.cur.execute(f"""SELECT (titulo, categoria, duracao, censura, nacional, nome_produtora) 
+        FROM (filme JOIN filme_produtora JOIN produtora) WHERE id_filme == {id_movie}""")
+        ret_vals = movie_data.fetchall()
         if not ret_vals:
             print(f"Nenhum filme encontrado com id {id_movie}\n")
         else:
-            is_national = "Internacional"
-            if ret_vals[0][4]:
-                is_national = "Nacional"
+            # Select actors
+            actors_data = self.cur.execute(f"""SELECT (nome_ator) FROM (filme_ator JOIN ator) 
+            WHERE id_filme == {id_movie}""")
+            actors_vals = actors_data.fetchall()
 
-            actors = ""
+            # Display result
             for row in ret_vals:
-                actors += row[5] + ", "
+                is_national = "Internacional"
+                if row[4]:
+                    is_national = "Nacional"
+                print(f"Título: {row[0]}; Categoria: {row[1]}; Duração: {row[2]}; Censura: {row[3]}; {is_national}; Atores: ", end='')
+                for i, actor in enumerate(actors_vals):
+                    print(actor, end='')
+                    if i != len(actors_vals) - 1:
+                        print(", ", end='')
+                print('')
 
-            print(f"Título: {ret_vals[0][0]}; Categoria: {ret_vals[0][1]}; Duração: {ret_vals[0][2]}; Censura: {ret_vals[0][3]}; {is_national}; Produtora: {ret_vals[0][5]}; Atores: {actors[:-2]}\n")
-    
 '''
 # Testando criação
 table.create('Esqueceram de mim', 'Comédia', 60*1 + 43, 'L', false, 1, [1, 2, 3])

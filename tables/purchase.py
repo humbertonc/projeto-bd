@@ -11,7 +11,6 @@ class PurchaseTable:
             id_cliente integer,
             forma_de_pagamento varchar(45) NOT NULL,
             data_compra datetime NOT NULL,
-            antecipada BOOLEAN,
             FOREIGN KEY (id_cliente) REFERENCES cliente (id_cliente)
         )
         """)
@@ -24,11 +23,11 @@ class PurchaseTable:
         )
         """)
 
-    def create(self, id_client, form_of_payment, date, in_advance, ids_products):
+    def create(self, id_client, form_of_payment, date, ids_products):
 
         try:
-            self.cur(f"""INSERT INTO compra(id_cliente, forma_de_pagamento, data_compra, antecipada) 
-            VALUES({id_client}, {form_of_payment}, {date}, {in_advance})""")
+            self.cur(f"""INSERT INTO compra(id_cliente, forma_de_pagamento, data_compra) 
+            VALUES({id_client}, {form_of_payment}, {date})""")
             id_purchase = self.cur("SELECT SCOPE_IDENTITY();")
             for id_product in ids_products:
                 self.cur.execute(f"""INSERT INTO compra_produto(id_compra, id_produto) 

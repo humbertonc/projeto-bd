@@ -8,6 +8,7 @@ from tables.screen import ScreenTable
 from tables.snack import SnackTable
 from tables.ticket import TicketTable
 from tables.voucher import VoucherTable
+from datetime import date
 import sqlite3 as sl
 import pandas as pd
 
@@ -19,7 +20,7 @@ def retornar():
     else:
         return False
 
-def show_movies(day):
+def mostrar_filmes(data):
     pass
 
 def tela_lanche():
@@ -29,7 +30,7 @@ def tela_cadastro(table):
 
     while(True):
 
-        print('Bem-vindo/a à tela de cadastro de clientes, você gostaria de se cadastrar (C), checar seu cadastro (R), atualizar seu cadastro (U) ou deletar seu cadastro (D)?')
+        print('Bem-vindo(a) à tela de cadastro de clientes, você gostaria de se cadastrar (C), checar seu cadastro (R), atualizar seu cadastro (U) ou deletar seu cadastro (D)?')
         flag_cadastro = input()
 
         if flag_cadastro.upper() == 'C':
@@ -85,15 +86,19 @@ def tela_cadastro(table):
 def tela_compra(tabelas):
     
     while(True):
-        print('Em que dia será sua compra? Digite o dia do mês, seguido do mês e do ano no formato dd/mm/yyyy')
-        data = input()
+        print('Bem-vindo(a) à tela de compra, você gostaria de fazer uma compra antecipada? S para sim ou N para não')
+        antecipada = input()
+        data = date.today().strftime("%d/%m/%Y")
+        if antecipada.upper() == 'S':
+            print('Para que dia será sua compra? Digite o dia do mês, seguido do mês e do ano no formato dd/mm/yyyy')
+            data = input()
+
         dia, mes, ano = data.split('/')
         d_semana = pd.to_datetime(f"{ano}-{mes}-{dia}").day_name()
-
         preco_dict = {'Monday': 15, 'Tuesday': 18, 'Quarta': 12, 'Thursday': 18, 'Friday': 20, 'Saturday': 23, 'Sunday': 20}
-        preco = preco_dict[d_semana]
+        preco = (1 + 0.1*(antecipada.upper() == 'S'))*preco_dict[d_semana]
 
-        id_sessao = show_movies(d_semana)
+        id_sessao = show_movies(data)
 
         print('Digite seu tipo de ingresso: adulto (A), estudante (E), infantil (I), idoso (O) e flamenguista (F)')
         tipo = input()
@@ -141,7 +146,7 @@ if __name__ == '__main__':
     tabelas['voucher'] = VoucherTable()
 
     while(True):
-        print('Bem-vindo/a ao cinema nome do cinema! Você gostaria de ir para a tela de cadastro ou fazer uma compra?')
+        print('Bem-vindo(a) ao cinema nome do cinema! Você gostaria de ir para a tela de cadastro ou fazer uma compra?')
         print('Digite C para se cadastrar, B para fazer uma compra ou E para sair da plataforma: ')
         flag_1 = input()
 
