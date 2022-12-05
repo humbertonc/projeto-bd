@@ -1,4 +1,5 @@
 import sqlite3 as sl
+import movie
 
 class ScheduleTable:
     def __init__(self):
@@ -28,28 +29,43 @@ class ScheduleTable:
             print("Não foi possível cadastrar a sessão")
         print('')
 
-    def read(self, id_session):
+    def read_by_id(self, id_session, movie_table : movie.MovieTable):
 
-        data = self.cur.execute(f"""SELECT (titulo, id_sala, horario, data_inicio, data_fim) 
-        FROM (programacao JOIN filme) WHERE id_sessao == {id_session}""")
+        data = self.cur.execute(f"""SELECT (id_movie, id_sala, horario, data_inicio, data_fim) 
+        FROM (programacao) WHERE id_sessao == {id_session}""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhuma sessão encontrada com id {id_session}")
         else:
             for row in ret_vals:
-                print(f"Título do filme: {row[0]}; Sala: {row[1]}; Horário: {row[2]}; Data de estreia: {row[3]}; Fim da sessão: {row[4]}")
+                movie_table.read(row[0])
+                print(f"Sala: {row[1]}; Horário: {row[2]}; Data de estreia: {row[3]}; Fim da sessão: {row[4]}")
         print("")
 
-    def read_all(self):
+    def read_by_date(self, date, movie_table : movie.MovieTable):
+
+        data = self.cur.execute(f"""SELECT (id_movie, id_sala, horario, data_inicio, data_fim) 
+        FROM (programacao) WHERE data_inicio <= {date} AND data_fim <= {date}""")
+        ret_vals = data.fetchall()
+        if not ret_vals:
+            print(f"Nenhuma sessão encontrada na data {date}")
+        else:
+            for row in ret_vals:
+                movie_table.read(row[0])
+                print(f"Sala: {row[1]}; Horário: {row[2]}; Data de estreia: {row[3]}; Fim da sessão: {row[4]}")
+        print("")
+
+    def read_all(self, movie_table : movie.MovieTable):
         
-        data = self.cur.execute(f"""SELECT titulo, id_sala, horario, data_inicio, data_fim
-        FROM (programacao JOIN filme)""")
+        data = self.cur.execute(f"""SELECT (id_sessao, id_movie, id_sala, horario, data_inicio, data_fim) 
+        FROM (programacao)""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhuma sessão encontrada")
         else:
             for row in ret_vals:
-                print(f"Título do filme: {row[0]}; Sala: {row[1]}; Horário: {row[2]}; Data de estreia: {row[3]}; Fim da sessão: {row[4]}")
+                movie_table.read(row[1])
+                print(f"ID: {row[0]}; Sala: {row[2]}; Horário: {row[3]}; Data de estreia: {row[4]}; Fim da sessão: {row[5]}")
         print("")
         
 '''

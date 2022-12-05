@@ -16,7 +16,7 @@ class TicketTable:
         CREATE TABLE if not exists ingresso (
             id_produto integer,
             id_sessao integer,
-            data date NOT NULL,
+            data_sessao date NOT NULL,
             tipo_ingresso varchar(15) NOT NULL,
             FOREIGN KEY (id_produto) REFERENCES produto (id_produto),
             FOREIGN KEY (id_sessao) REFERENCES programacao (id_sessao)
@@ -28,7 +28,7 @@ class TicketTable:
         try:
             self.cur(f"INSERT INTO produto(cod_produto, preco) VALUES(1, {price})")
             id_product = self.cur("SELECT SCOPE_IDENTITY();")
-            self.cur.execute(f"""INSERT INTO ingresso(id_produto, id_sessao, data, tipo_ingresso) 
+            self.cur.execute(f"""INSERT INTO ingresso(id_produto, id_sessao, data_sessao, tipo_ingresso) 
             VALUES({id_product}, {id_session}, {date}, {type})""")
             print(f"Ingresso gerado com sucesso")
         except:
@@ -37,22 +37,26 @@ class TicketTable:
 
     def read(self, id):
 
-        data = self.cur.execute(f"""SELECT (preco, id_sessao, data, tipo_ingresso) 
+        data = self.cur.execute(f"""SELECT (id_sessao, data_sessao, tipo_ingresso, preco) 
         FROM (produto JOIN ingresso) WHERE id_produto == {id}""")
         ret_vals = data.fetchall()
         if not ret_vals:
-            print(f"Nenhum ingresso encontrado com id {id}\n")
+            print(f"Nenhum ingresso encontrado com id {id}")
         else:
-            return ret_vals
+            for row in ret_vals:
+                print(f"ID da sessão: {row[0]}; Data da sessão: {row[1]}; Tipo de ingresso: {row[2]}; Preço: {row[3]}")
+        print('')
 
     def read_all(self):
-        data = self.cur.execute(f"""SELECT (id_produto, preco, id_sessao, data, tipo_ingresso) 
+        data = self.cur.execute(f"""SELECT (id_produto, id_sessao, data_sessao, tipo_ingresso, preco) 
         FROM (produto JOIN ingresso)""")
         ret_vals = data.fetchall()
         if not ret_vals:
-            print(f"Nenhum ingresso encontrado\n")
+            print(f"Nenhum ingresso encontrado")
         else:
-            return ret_vals
+            for row in ret_vals:
+                print(f"ID: {row[0]}; ID da sessão: {row[1]}; Data da sessão: {row[2]}; Tipo de ingresso: {row[3]}; Preço: {row[4]}")
+        print('')
         
 '''
 # Testando criação
