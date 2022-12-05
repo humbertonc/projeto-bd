@@ -6,7 +6,7 @@ class ProducerTable:
         self.con = sl.connect('cinema_data.db')
         self.cur = self.con.cursor()
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE produtora (
+        CREATE TABLE if not exists produtora (
             id_produtora serial PRIMARY KEY,
             nome_produtora varchar(90) NOT NULL
         )

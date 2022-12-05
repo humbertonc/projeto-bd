@@ -6,18 +6,20 @@ class TicketTable:
         self.con = sl.connect('cinema_data.db')
         self.cur = self.con.cursor()
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE produto (
+        CREATE TABLE if not exists produto (
             id_produto serial PRIMARY KEY,
             cod_produto integer NOT NULL,
-            preco numeric(7,2) NOT NULL,
+            preco numeric(7,2) NOT NULL
         )
         """)
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE ingresso (
-            FOREIGN KEY (id_produto) REFERENCES produto(id_produto) PRIMARY KEY,
-            FOREIGN KEY (id_sessao) REFERENCES programacao (id_sessao),
+        CREATE TABLE if not exists ingresso (
+            id_produto integer,
+            id_sessao integer,
             data date NOT NULL,
-            tipo_ingresso varchar(15) NOT NULL
+            tipo_ingresso varchar(15) NOT NULL,
+            FOREIGN KEY (id_produto) REFERENCES produto (id_produto),
+            FOREIGN KEY (id_sessao) REFERENCES programacao (id_sessao)
         )
         """)
 

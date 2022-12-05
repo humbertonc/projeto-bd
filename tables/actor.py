@@ -6,7 +6,7 @@ class ActorTable:
         self.con = sl.connect('cinema_data.db')
         self.cur = self.con.cursor()
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE ator (
+        CREATE TABLE if not exists ator (
             id_ator serial PRIMARY KEY,
             nome_ator varchar(90) NOT NULL
         )

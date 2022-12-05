@@ -6,7 +6,7 @@ class ScreenTable:
         self.con = sl.connect('cinema_data.db')
         self.cur = self.con.cursor()
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE sala (
+        CREATE TABLE if not exists sala (
             id_sala serial PRIMARY KEY,
             capacidade integer NOT NULL
         )

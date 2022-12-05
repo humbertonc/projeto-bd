@@ -6,11 +6,12 @@ class VoucherTable:
         self.con = sl.connect('cinema_data.db')
         self.cur = self.con.cursor()
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE voucher (
+        CREATE TABLE if not exists voucher (
             id_voucher integer NOT NULL,
+            id_produto integer,
+            quantidade integer NOT NULL,
             FOREIGN KEY (id_produto) REFERENCES lanche (id_produto),
-            CONSTRAINT id_voucher_comp PRIMARY KEY (id_voucher, id_produto),
-            quantidade integer NOT NULL
+            CONSTRAINT id_voucher_comp PRIMARY KEY (id_voucher, id_produto)
         )
         """)
 

@@ -6,7 +6,7 @@ class MovieTable:
         self.con = sl.connect('cinema_data.db')
         self.cur = self.con.cursor()
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE filme (
+        CREATE TABLE if not exists filme (
             id_filme serial PRIMARY KEY,
             titulo varchar(90) NOT NULL,
             categoria varchar(90) NOT NULL,
@@ -16,13 +16,17 @@ class MovieTable:
         )
         """)
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE filme_produtora (
+        CREATE TABLE if not exists filme_produtora (
+            id_filme integer,
+            id_produtora integer,
             FOREIGN KEY (id_filme) REFERENCES filme (id_filme),
             FOREIGN KEY (id_produtora) REFERENCES produtora (id_produtora)
         )
         """)
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE filme_ator (
+        CREATE TABLE if not exists filme_ator (
+            id_filme integer,
+            id_ator integer,
             FOREIGN KEY (id_filme) REFERENCES filme (id_filme),
             FOREIGN KEY (id_ator) REFERENCES ator (id_ator)
         )

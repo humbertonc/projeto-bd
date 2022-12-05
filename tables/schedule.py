@@ -6,13 +6,15 @@ class ScheduleTable:
         self.con = sl.connect('cinema_data.db')
         self.cur = self.con.cursor()
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE programacao (
+        CREATE TABLE if not exists programacao (
             id_sessao serial PRIMARY KEY,
-            FOREIGN KEY (id_filme) REFERENCES filme (id_filme),
-            FOREIGN KEY (id_sala) REFERENCES sala (id_sala),
+            id_filme integer,
+            id_sala integer,
             horario time NOT NULL,
             data_inicio date NOT NULL,
-            data_fim date NOT NULL
+            data_fim date NOT NULL,
+            FOREIGN KEY (id_filme) REFERENCES filme (id_filme),
+            FOREIGN KEY (id_sala) REFERENCES sala (id_sala)
         )
         """)
 
@@ -40,7 +42,7 @@ class ScheduleTable:
 
     def read_all(self):
         
-        data = self.cur.execute(f"""SELECT (titulo, id_sala, horario, data_inicio, data_fim) 
+        data = self.cur.execute(f"""SELECT titulo, id_sala, horario, data_inicio, data_fim
         FROM (programacao JOIN filme)""")
         ret_vals = data.fetchall()
         if not ret_vals:

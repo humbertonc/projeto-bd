@@ -6,16 +6,17 @@ class SnackTable:
         self.con = sl.connect('cinema_data.db')
         self.cur = self.con.cursor()
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE produto (
+        CREATE TABLE if not exists produto (
             id_produto serial PRIMARY KEY,
             cod_produto integer NOT NULL,
-            preco numeric(7,2) NOT NULL,
+            preco numeric(7,2) NOT NULL
         )
         """)
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE CREATE TABLE lanche (
-            FOREIGN KEY (id_produto) REFERENCES produto (id_produto) PRIMARY KEY,
-            nome_lanche varchar(90) NOT NULL
+        CREATE TABLE if not exists lanche (
+            id_produto integer,
+            nome_lanche varchar(90) NOT NULL,
+            FOREIGN KEY (id_produto) REFERENCES produto (id_produto)
         )
         """)
 

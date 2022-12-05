@@ -6,18 +6,21 @@ class PurchaseTable:
         self.con = sl.connect('cinema_data.db')
         self.cur = self.con.cursor()
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE compra (
+        CREATE TABLE if not exists compra (
             id_compra serial PRIMARY KEY,
-            FOREIGN KEY (id_cliente) REFERENCES cliente (id_cliente),
+            id_cliente integer,
             forma_de_pagamento varchar(45) NOT NULL,
             data_compra datetime NOT NULL,
-            antecipada BOOLEAN
+            antecipada BOOLEAN,
+            FOREIGN KEY (id_cliente) REFERENCES cliente (id_cliente)
         )
         """)
         self.cur.execute("""
-        CREATE TABLE if not exists CREATE TABLE compra_produto (
+        CREATE TABLE if not exists compra_produto (
+            id_compra integer,
+            id_produto integer,
             FOREIGN KEY (id_compra) REFERENCES compra (id_compra),
-            FOREIGN KEY (id_produto) REFERENCES produto(id_produto)
+            FOREIGN KEY (id_produto) REFERENCES produto (id_produto)
         )
         """)
 
