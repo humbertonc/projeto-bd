@@ -44,7 +44,7 @@ class TicketTable:
             print(f"Nenhum ingresso encontrado com id {id}")
         else:
             for row in ret_vals:
-                print(f"ID da sessão: {row[0]}; Data da sessão: {row[1]}; Tipo de ingresso: {row[2]}; Preço: {row[3]}")
+                print(f"ID da sessão: {row[0]}; Data da sessão: {row[1]}; Tipo de ingresso: {row[2]}; Preço: R${row[3]}")
         print('')
 
     def read_all(self):
@@ -55,7 +55,7 @@ class TicketTable:
             print(f"Nenhum ingresso encontrado")
         else:
             for row in ret_vals:
-                print(f"ID: {row[0]}; ID da sessão: {row[1]}; Data da sessão: {row[2]}; Tipo de ingresso: {row[3]}; Preço: {row[4]}")
+                print(f"ID: {row[0]}; ID da sessão: {row[1]}; Data da sessão: {row[2]}; Tipo de ingresso: {row[3]}; Preço: R${row[4]}")
         print('')
         
 '''

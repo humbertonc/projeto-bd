@@ -41,7 +41,7 @@ class SnackTable:
             print(f"Nenhum lanche encontrado com nome {name}\n")
         else:
             for row in ret_vals:
-                print(f"ID: {row[0]}; Nome do produto: {row[1]}; Preço do produto: {row[2]}\n")
+                print(f"ID: {row[0]}; Nome do produto: {row[1]}; Preço do produto: R${row[2]}\n")
             return ret_vals
 
     def read_all(self):
@@ -51,7 +51,7 @@ class SnackTable:
             print(f"Nenhum lanche encontrado")
         else:
             for row in ret_vals:
-                print(f"ID: {row[0]}; Nome do produto: {row[1]}; Preço do produto: {row[2]}")
+                print(f"ID: {row[0]}; Nome do produto: {row[1]}; Preço do produto: R${row[2]}")
         print('')
         
 '''
