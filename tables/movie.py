@@ -7,7 +7,7 @@ class MovieTable:
         self.cur = self.con.cursor()
         self.cur.execute("""
         CREATE TABLE if not exists filme (
-            id_filme serial PRIMARY KEY,
+            id_filme integer PRIMARY KEY autoincrement NOT NULL,
             titulo varchar(90) NOT NULL,
             categoria varchar(90) NOT NULL,
             duracao integer NOT NULL,
@@ -35,9 +35,9 @@ class MovieTable:
     def create(self, title, genre, duration, rating, national, id_producer, ids_actors):
 
         try:
-            self.cur(f"""INSERT INTO filme(titulo, categoria, duracao, censura, nacional) 
-            VALUES({title}, {genre}, {duration}, {rating}, {national})""")
-            id_movie = self.cur("SELECT SCOPE_IDENTITY();")
+            self.cur.execute(f"""INSERT INTO filme (titulo, categoria, duracao, censura, nacional) 
+            VALUES('{title}', '{genre}', {duration}, '{rating}', {national})""")
+            id_movie = self.cur.execute("SELECT SCOPE_IDENTITY();")
             self.cur.execute(f"""INSERT INTO filme_produtora(id_filme, id_produtora) 
             VALUES({id_movie}, {id_producer})""")
             for id_actor in ids_actors:

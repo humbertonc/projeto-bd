@@ -7,7 +7,7 @@ class TicketTable:
         self.cur = self.con.cursor()
         self.cur.execute("""
         CREATE TABLE if not exists produto (
-            id_produto serial PRIMARY KEY,
+            id_produto integer PRIMARY KEY autoincrement NOT NULL,
             cod_produto integer NOT NULL,
             preco numeric(7,2) NOT NULL
         )

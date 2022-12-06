@@ -7,7 +7,7 @@ class PurchaseTable:
         self.cur = self.con.cursor()
         self.cur.execute("""
         CREATE TABLE if not exists compra (
-            id_compra serial PRIMARY KEY,
+            id_compra integer PRIMARY KEY autoincrement NOT NULL,
             id_cliente integer,
             forma_de_pagamento varchar(45) NOT NULL,
             data_compra datetime NOT NULL,

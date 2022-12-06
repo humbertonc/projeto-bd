@@ -7,7 +7,7 @@ class ScreenTable:
         self.cur = self.con.cursor()
         self.cur.execute("""
         CREATE TABLE if not exists sala (
-            id_sala serial PRIMARY KEY,
+            id_sala integer PRIMARY KEY autoincrement NOT NULL,
             capacidade integer NOT NULL
         )
         """)

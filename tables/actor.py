@@ -7,7 +7,7 @@ class ActorTable:
         self.cur = self.con.cursor()
         self.cur.execute("""
         CREATE TABLE if not exists ator (
-            id_ator serial PRIMARY KEY,
+            id_ator integer PRIMARY KEY autoincrement NOT NULL,
             nome_ator varchar(90) NOT NULL
         )
         """)

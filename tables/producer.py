@@ -7,7 +7,7 @@ class ProducerTable:
         self.cur = self.con.cursor()
         self.cur.execute("""
         CREATE TABLE if not exists produtora (
-            id_produtora serial PRIMARY KEY,
+            id_produtora integer PRIMARY KEY autoincrement NOT NULL,
             nome_produtora varchar(90) NOT NULL
         )
         """)
