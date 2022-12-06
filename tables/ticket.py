@@ -26,8 +26,8 @@ class TicketTable:
     def create(self, price, id_session, date, type):
 
         try:
-            tickets_sold = self.cur.execute(f"""COUNT(id_produto) FROM ingresso 
-            WHERE id_sessao == {id_session} AND data == {date}""").fetchall()[0][0]
+            tickets_sold = self.cur.execute(f"""SELECT COUNT(*) FROM ingresso 
+            WHERE id_sessao == {id_session} AND data_sessao == {date}""").fetchall()[0][0]
             session_capacity = self.cur.execute(f"""SELECT capacidade FROM sala, programacao
             WHERE sala.id_sala == programacao.id_sala AND id_sessao == {id_session}""").fetchall()[0][0]
             if tickets_sold < session_capacity:
@@ -39,6 +39,7 @@ class TicketTable:
                 return id_product
             else:
                 print("Sessão esgotada, não foi possível gerar o ingresso")
+                return -1
         except:
             print("Não foi possível gerar o ingresso")
         print('')

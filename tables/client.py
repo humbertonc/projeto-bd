@@ -26,11 +26,24 @@ class ClientTable:
         data = self.cur.execute(f"SELECT * FROM cliente WHERE nome_cliente == '{name}'")
         ret_vals = data.fetchall()
         if not ret_vals:
-            print(f"Nenhum cliente encontrado com nome {name}")
+            return False
+            #print(f"Nenhum cliente encontrado com nome {name}")
+        else:
+            return True
+            #for row in ret_vals:
+            #    print(f"ID: {row[0]}; Nome do cliente: {row[1]}")
+        print('')
+    
+    def get_id_by_name(self, name):
+
+        data = self.cur.execute(f"SELECT id_cliente FROM cliente WHERE nome_cliente == '{name}'")
+        ret_vals = data.fetchall()
+        if not ret_vals:
+            return -1
+            #print(f"Nenhum cliente encontrado com nome {name}")
         else:
             for row in ret_vals:
-                print(f"ID: {row[0]}; Nome do cliente: {row[1]}")
-        print('')
+                return row[0]
 
     def read_all(self):
         data = self.cur.execute(f"SELECT * FROM cliente")
@@ -45,10 +58,10 @@ class ClientTable:
     def update(self, name='', id=0, new_name=''):
 
         if name:
-            data = self.cur.execute(f"UPDATE cliente SET nome_cliente = {new_name} WHERE nome_cliente == '{name}'")
+            data = self.cur.execute(f"UPDATE cliente SET nome_cliente = '{new_name}' WHERE nome_cliente == '{name}'")
             print(f'Cliente {name} trocado para {new_name}')
         elif id:
-            data = self.cur.execute(f"UPDATE cliente SET nome_cliente = {new_name} WHERE id_cliente == {id}")
+            data = self.cur.execute(f"UPDATE cliente SET nome_cliente = '{new_name}' WHERE id_cliente == {id}")
             print(f'Cliente de id {id} trocado para {new_name}')
         else:
             print("Nao foi possivel atualizar as informacoes do cliente")
@@ -66,7 +79,7 @@ class ClientTable:
             print("Nao foi possivel deletar o cliente")
         print('')
 
-'''       
+'''  
 table = ClientTable()
 # Testando criação
 table.create('beto')
@@ -75,7 +88,8 @@ table.create('lara')
 # Testando leitura
 table.read('beto')
 table.read('lara')
-table.read('joaozinho')'''
+table.read('joaozinho')
+print(table.get_id_by_name('lara'))'''
 
 # Testando update
 '''table.update(name='lara',new_name='ponpon')
@@ -86,8 +100,8 @@ table.read('bebeto')
 table.read('ponpon')'''
 
 # Testando deleção
-'''table.read_all()
-table.delete('bebeto')
+#table.read_all()
+'''table.delete('bebeto')
 table.delete(id=2)
 table.read_all()'''
 

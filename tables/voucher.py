@@ -1,24 +1,11 @@
 import sqlite3 as sl
+from tables.snack import SnackTable
 
 class VoucherTable:
     def __init__(self):
 
         self.con = sl.connect('cinema_data.db')
         self.cur = self.con.cursor()
-        self.cur.execute("""
-        CREATE TABLE if not exists produto (
-            id_produto integer PRIMARY KEY autoincrement NOT NULL,
-            cod_produto integer NOT NULL,
-            preco numeric(7,2) NOT NULL
-        )
-        """)
-        self.cur.execute("""
-        CREATE TABLE if not exists lanche (
-            id_produto integer,
-            nome_lanche varchar(90) NOT NULL,
-            FOREIGN KEY (id_produto) REFERENCES produto (id_produto)
-        )
-        """)
         self.cur.execute("""
         CREATE TABLE if not exists voucher (
             id_voucher integer NOT NULL,
@@ -31,12 +18,11 @@ class VoucherTable:
 
     def create(self, id_voucher, id_product, quantity):
 
-        try:
-            self.cur.execute(f"""INSERT INTO voucher(id_voucher, id_produto, quantidade) 
-            VALUES({id_voucher}, {id_product}, {quantity})""")
-            print(f"Voucher gerado com sucesso")
-        except:
-            print("Não foi possível gerar o voucher")
+        #try:
+        self.cur.execute(f"""INSERT INTO voucher(id_voucher, id_produto, quantidade) 
+        VALUES({id_voucher}, {id_product}, {quantity})""")
+        #except:
+        #    print("Não foi possível gerar o voucher")
         print('')
 
     def read(self, id_voucher):
@@ -54,7 +40,7 @@ class VoucherTable:
 
     def read_all(self):
         data = self.cur.execute(f"""SELECT id_voucher, nome_lanche, quantidade, preco 
-        FROM produto, lanche, voucher WHERE produto.id_produto == lanche.id_produto AND lanche.id_produto == voucher.id_produto""")
+        FROM produto, lanche, voucher WHERE produto.id_produto == lanche.id_produto AND produto.id_produto == voucher.id_produto""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum voucher encontrado")
@@ -71,10 +57,15 @@ class VoucherTable:
         else:
             return ret_vals
         
-'''
+
 # Testando criação
+'''
+snack_table = SnackTable()
+snack_table.create(12,'biscoito')
+snack_table.create(15,'bolacha')
+snack_table.con.commit()
+snack_table.con.close()
 table = VoucherTable()
-table.cur.execute(f"INSERT INTO produtora(nome_produtora) VALUES('produtora')")
 table.create(1, 1, 2)
 table.create(1, 2, 4)
 

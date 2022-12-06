@@ -12,13 +12,34 @@ from datetime import date
 import sqlite3 as sl
 import pandas as pd
 
-def retornar():
+id_voucher = 1
+
+def retornar(tabela):
     print('Aperte C para voltar para tela de cadastro e V para voltar para a tela inicial:')
     flag_voltar = input()
     if flag_voltar.upper() == 'V':
+        tabela.con.commit()
+        tabela.con.close()
         return True
     else:
         return False
+    
+def tela_login(tabela):
+    tabela.con = sl.connect('cinema_data.db')
+    tabela.cur = tabela.con.cursor()
+    print('Por favor digite seu nome para fazer login')
+    nome = input()
+    ret_read = tabela.read(nome)
+
+    if ret_read >= 0:
+        tabela.con.commit()
+        tabela.con.close()
+        print('Login realizado!')
+        return ret_read, True
+    else:
+        print('Nome não cadastrado, por favor realize seu cadastro na página principal')
+        print('')
+        return '', False
 
 def mostrar_filmes(data, tabelas):
     
@@ -30,21 +51,56 @@ def mostrar_filmes(data, tabelas):
     return int(input())
 
 def tela_lanche(tabelas):
-    input_id = 0
+    tabelas['lanche'].con = sl.connect('cinema_data.db')
+    tabelas['lanche'].cur = tabelas['lanche'].con.cursor()
+    input_id = -1
     lista_ids = []
     dict_id = {}
-    while input_id.upper() != 'E':
+    while input_id != 0:
         tabelas['lanche'].read_all()
-        lista_ids(int(input()))
+        input_id = int(input())
+        lista_ids.append(input_id)
         print('\n\n')
+    tabelas['lanche'].con.commit()
+    tabelas['lanche'].con.close()
 
     print('Obrigado por selecionar seus lanches!')
     dict_id = dict()
     for i in lista_ids:
         dict_id[i] = dict_id.get(i, 0) + 1
-    
+    dict_id.pop(0, None)
 
-def tela_cadastro(table):
+    list_unique_id = []
+    
+    global id_voucher
+    
+    for id_product, quantidade in dict_id.items():
+        tabelas['voucher'].create(id_voucher, id_product, quantidade)
+        list_unique_id.append(id_product)
+    id_voucher += 1
+    tabelas['voucher'].con.commit()
+    tabelas['voucher'].con.close()
+    
+    return list_unique_id, id_voucher - 1
+
+def tela_pagamento(tabelas, id_cliente, ids_compras, id_voucher):
+
+    while(True):
+        print('Por favor, digite como será a forma de pagamento da compra: (C) crédito; (D) débito; (E) espécie; (P) pix')
+        forma_pagamento_char = input().upper()
+
+        forma_dict = {'C': 'CREDITO', 'D': 'DEBITO', 'E':'ESPECIE','P':'PIX'}
+        if forma_pagamento_char not in forma_dict:
+            print("Forma inválida. Digite novamente.")
+            continue
+
+        id_compra = tabelas['compra'].create(id_cliente, forma_dict[forma_pagamento_char], date.today(), ids_compras, id_voucher)
+        tabelas['compra'].read_by_id(id_compra)
+        tabelas['compra'].con.commit()
+        tabelas['compra'].con.close()
+        break
+
+def tela_cadastro(tabela):
 
     while(True):
 
@@ -55,9 +111,9 @@ def tela_cadastro(table):
 
             print('Digite o seu nome para se cadastrar: ')
             nome = input()
-            table.create(nome)
+            tabela.create(nome)
 
-            if retornar():
+            if retornar(tabela):
                 break
             else:
                 continue
@@ -67,9 +123,13 @@ def tela_cadastro(table):
 
             print('Digite o nome do usuário que você deseja checar o cadastro')
             nome = input()
-            table.read(name=nome)
+            ap = tabela.read(name=nome)
+            if ap:
+                print(f'Usuário com nome {nome} encontrado!')
+            else:
+                print('Usuário não encontrado')
 
-            if retornar():
+            if retornar(tabela):
                 break
             else:
                 continue
@@ -81,9 +141,9 @@ def tela_cadastro(table):
             nome_antigo = input()
             print('Digite o novo nome do usuário:')
             nome_novo = input()
-            table.update(name=nome_antigo, new_name=nome_novo)
+            tabela.update(name=nome_antigo, new_name=nome_novo)
 
-            if retornar():
+            if retornar(tabela):
                 break
             else:
                 continue
@@ -93,15 +153,15 @@ def tela_cadastro(table):
 
             print('Digite o nome do usuário que você deseja deletar:')
             nome = input()
-            table.delete(name=nome)
+            tabela.delete(name=nome)
 
-            if retornar():
+            if retornar(tabela):
                 break
             else:
                 continue
 
 
-def tela_compra(tabelas):
+def tela_compra(id_cliente, tabelas):
     
     while(True):
         
@@ -116,10 +176,10 @@ def tela_compra(tabelas):
 
         dia, mes, ano = data.split('/')
         d_semana = pd.to_datetime(f"{ano}-{mes}-{dia}").day_name()
-        preco_dict = {'Monday': 15, 'Tuesday': 18, 'Quarta': 12, 'Thursday': 18, 'Friday': 20, 'Saturday': 23, 'Sunday': 20}
+        preco_dict = {'Monday': 15, 'Tuesday': 18, 'Wednesday': 12, 'Thursday': 18, 'Friday': 20, 'Saturday': 23, 'Sunday': 20}
         preco = (1 + 0.1*(antecipada.upper() == 'S'))*preco_dict[d_semana]
 
-        id_sessao = mostrar_filmes(data,tabelas)
+        id_sessao = mostrar_filmes(f"{ano}-{mes}-{dia}",tabelas)
 
         print('Digite seu tipo de ingresso: adulto (A), estudante (E), infantil (I), idoso (O) e flamenguista (F)')
         tipo = input()
@@ -135,22 +195,38 @@ def tela_compra(tabelas):
             print('Compra cancelada, obrigado por usar a plataforma!')
             break
 
-        ids_compras.append(tabelas['ingresso'].create(preco, id_sessao, f"{ano}-{mes}-{dia}", nome_dict[tipo.upper()]))
+        ret_ingresso = tabelas['ingresso'].create(preco, id_sessao, f"{ano}-{mes}-{dia}", nome_dict[tipo.upper()])
 
-        print('Você gostaria de comprar um lanche junto ao seu ingresso? S para sim ou N para não')
+        if ret_ingresso == -1:
+            print('Você será redirecionado para a tela de compra')
+            continue
+        
+        ids_compras.append(ret_ingresso)
+
+        print('Obrigado pela compra, você gostaria de comprar mais um ingresso? S ou N')
+        flag_yes = input()
+
+        if flag_yes.upper() == 'S':
+            continue
+
+        tabelas['ingresso'].con.commit()
+        tabelas['ingresso'].con.close()
+        print('Você gostaria de comprar um lanche junto a compra do ingresso? S para sim ou N para não')
         flag_confirmar = input()
 
         if flag_confirmar.upper() == 'S':
             print('Por favor, digite os lanches que você deseja comprar pelo número do id, um de cada vez:')
-            print('Caso não deseje mais nenhum lanche, digite E')
-            tela_lanche(tabelas)
+            print('Caso não deseje mais nenhum lanche, digite 0')
+            ids_snacks, id_voucher = tela_lanche(tabelas)
+            ids_compras.extend(ids_snacks)
+        else:
+            id_voucher=None
 
-        print('Obrigado pela compra, você gostaria de realizar outra? S ou N')
-        flag_yes = input()
+        tela_pagamento(tabelas, id_cliente, ids_compras, id_voucher)
 
-        if flag_yes.upper() == 'N':
-            print('Você será direcionado a tela inicial!\n')
-            break
+        print('Obrigado pela preferência, você será redirecionado(a) para o menu principal!')
+        print('')
+        break
 
 
 
@@ -180,23 +256,29 @@ if __name__ == '__main__':
     tabelas['filme'].create('Esqueceram de mim', 'Comédia', 60*1 + 43, 'L', False, 1, [1, 2, 3])
     tabelas['filme'].con.commit()
     tabelas['filme'].con.close()
-    tabelas['sala'].create(200)
+    tabelas['sala'].create(3)
     tabelas['sala'].con.commit()
     tabelas['sala'].con.close()
     tabelas['programacao'].create(1, 1, '12:00:00', '2022-12-05', '2022-12-20')
     tabelas['programacao'].con.commit()
     tabelas['programacao'].con.close()
+    tabelas['lanche'].create(12,'biscoito')
+    tabelas['lanche'].create(15,'bolacha')
+    tabelas['lanche'].con.commit()
+    tabelas['lanche'].con.close()
 
     while(True):
-        print('Bem-vindo(a) ao cinema nome do cinema! Você gostaria de ir para a tela de cadastro ou fazer uma compra?')
-        print('Digite C para se cadastrar, B para fazer uma compra ou E para sair da plataforma: ')
+        print('Bem-vindo(a) ao Cinema Sauro! Você gostaria de ir para a tela de cadastro ou fazer login?')
+        print('Digite C para se cadastrar, L para fazer login ou E para sair da plataforma: ')
         flag_1 = input()
 
         if flag_1.upper() == 'C':
             tela_cadastro(tabelas['cliente'])
 
-        elif flag_1.upper() == 'B':
-            tela_compra(tabelas)
+        elif flag_1.upper() == 'L':
+            nome, aprovado = tela_login(tabelas['cliente'])
+            if aprovado:
+                tela_compra(nome, tabelas)
 
         elif flag_1.upper() == 'E':
             print('Obrigado por usar nossa plataforma! Até a próxima!')
@@ -205,6 +287,3 @@ if __name__ == '__main__':
         else:
             print('Input inválido digitado, aperte Enter para tentar novamente!')
             _val = input()
-
-    tabelas['cliente'].con.commit()
-    tabelas['cliente'].con.close()

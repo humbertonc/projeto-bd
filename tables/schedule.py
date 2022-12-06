@@ -48,7 +48,7 @@ class ScheduleTable:
 
     def read_by_date(self, date, movie_table : MovieTable):
 
-        data = self.cur.execute(f"""SELECT id_filme, id_sala, horario, data_inicio, data_fim
+        data = self.cur.execute(f"""SELECT id_filme, id_sala, horario, data_inicio, data_fim, id_sessao
         FROM (programacao) WHERE '{date}' between data_inicio AND data_fim""")
         ret_vals = data.fetchall()
         if not ret_vals:
@@ -58,7 +58,7 @@ class ScheduleTable:
             movie_table.cur = movie_table.con.cursor()
             for row in ret_vals:
                 movie_table.read(row[0])
-                print(f"Sala: {row[1]}; Horário: {row[2]}; Data de estreia: {row[3]}; Fim da sessão: {row[4]}")
+                print(f"ID: {row[5]}; Sala: {row[1]}; Horário: {row[2]}; Data de estreia: {row[3]}; Fim da sessão: {row[4]}")
             movie_table.con.close()
         print("")
 
