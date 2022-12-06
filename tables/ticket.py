@@ -26,19 +26,20 @@ class TicketTable:
     def create(self, price, id_session, date, type):
 
         try:
-            self.cur(f"INSERT INTO produto(cod_produto, preco) VALUES(1, {price})")
-            id_product = self.cur("SELECT SCOPE_IDENTITY();")
+            self.cur.execute(f"INSERT INTO produto(cod_produto, preco) VALUES(1, {price})")
+            id_product = self.cur.execute("SELECT last_insert_rowid();").fetchall()[0][0]
             self.cur.execute(f"""INSERT INTO ingresso(id_produto, id_sessao, data_sessao, tipo_ingresso) 
-            VALUES({id_product}, {id_session}, {date}, {type})""")
+            VALUES({id_product}, {id_session}, '{date}', '{type}')""")
             print(f"Ingresso gerado com sucesso")
+            return id_product
         except:
             print("Não foi possível gerar o ingresso")
         print('')
 
     def read(self, id):
 
-        data = self.cur.execute(f"""SELECT (id_sessao, data_sessao, tipo_ingresso, preco) 
-        FROM (produto JOIN ingresso) WHERE id_produto == {id}""")
+        data = self.cur.execute(f"""SELECT id_sessao, data_sessao, tipo_ingresso, preco 
+        FROM produto, ingresso WHERE produto.id_produto == ingresso.id_produto AND produto.id_produto == {id}""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum ingresso encontrado com id {id}")
@@ -48,8 +49,8 @@ class TicketTable:
         print('')
 
     def read_all(self):
-        data = self.cur.execute(f"""SELECT (id_produto, id_sessao, data_sessao, tipo_ingresso, preco) 
-        FROM (produto JOIN ingresso)""")
+        data = self.cur.execute(f"""SELECT produto.id_produto, id_sessao, data_sessao, tipo_ingresso, preco 
+        FROM produto, ingresso WHERE produto.id_produto == ingresso.id_produto""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum ingresso encontrado")
@@ -58,16 +59,17 @@ class TicketTable:
                 print(f"ID: {row[0]}; ID da sessão: {row[1]}; Data da sessão: {row[2]}; Tipo de ingresso: {row[3]}; Preço: R${row[4]}")
         print('')
         
-'''
+
 # Testando criação
+'''table = TicketTable()
 table.create(15.50, 1, '2022-12-06', 'ESTUDANTE')
 table.create(7.75, 1, '2022-12-06', 'INFANTIL')
 
 # Testando leitura
-print(table.read(1))
-print(table.read(2))
-print(table.read_all())
-'''
+table.read(1)
+table.read(2)
+table.read_all()
+
 
 #table.con.commit()
-#table.con.close()
+table.con.close()'''

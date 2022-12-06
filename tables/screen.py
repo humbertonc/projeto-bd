@@ -15,7 +15,7 @@ class ScreenTable:
     def create(self, capacity):
 
         try:
-            self.cur(f"INSERT INTO sala(capacidade) VALUES({capacity})")
+            self.cur.execute(f"INSERT INTO sala(capacidade) VALUES({capacity})")
             print(f"Sala cadastrada com sucesso")
         except:
             print("Não foi possível cadastrar a sala")

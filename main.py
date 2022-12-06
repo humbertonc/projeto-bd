@@ -20,11 +20,29 @@ def retornar():
     else:
         return False
 
-def mostrar_filmes(data):
-    pass
+def mostrar_filmes(data, tabelas):
+    
+    print('Por favor, digite a sessão que você deseja comprar pelo número do id:')
+    tabelas['programacao'].con = sl.connect('cinema_data.db')
+    tabelas['programacao'].cur = tabelas['programacao'].con.cursor()
+    tabelas['programacao'].read_by_date(data, tabelas['filme'])
+    tabelas['programacao'].con.close()
+    return int(input())
 
-def tela_lanche():
-    pass
+def tela_lanche(tabelas):
+    input_id = 0
+    lista_ids = []
+    dict_id = {}
+    while input_id.upper() != 'E':
+        tabelas['lanche'].read_all()
+        lista_ids(int(input()))
+        print('\n\n')
+
+    print('Obrigado por selecionar seus lanches!')
+    dict_id = dict()
+    for i in lista_ids:
+        dict_id[i] = dict_id.get(i, 0) + 1
+    
 
 def tela_cadastro(table):
 
@@ -86,6 +104,9 @@ def tela_cadastro(table):
 def tela_compra(tabelas):
     
     while(True):
+        
+        ids_compras = []
+
         print('Bem-vindo(a) à tela de compra, você gostaria de fazer uma compra antecipada? S para sim ou N para não')
         antecipada = input()
         data = date.today().strftime("%d/%m/%Y")
@@ -98,7 +119,7 @@ def tela_compra(tabelas):
         preco_dict = {'Monday': 15, 'Tuesday': 18, 'Quarta': 12, 'Thursday': 18, 'Friday': 20, 'Saturday': 23, 'Sunday': 20}
         preco = (1 + 0.1*(antecipada.upper() == 'S'))*preco_dict[d_semana]
 
-        id_sessao = show_movies(data)
+        id_sessao = mostrar_filmes(data,tabelas)
 
         print('Digite seu tipo de ingresso: adulto (A), estudante (E), infantil (I), idoso (O) e flamenguista (F)')
         tipo = input()
@@ -114,13 +135,15 @@ def tela_compra(tabelas):
             print('Compra cancelada, obrigado por usar a plataforma!')
             break
 
-        tabelas['ingresso'].create(preco, id_sessao, f"{ano}-{mes}-{dia}", nome_dict[tipo.upper()])
+        ids_compras.append(tabelas['ingresso'].create(preco, id_sessao, f"{ano}-{mes}-{dia}", nome_dict[tipo.upper()]))
 
         print('Você gostaria de comprar um lanche junto ao seu ingresso? S para sim ou N para não')
         flag_confirmar = input()
 
         if flag_confirmar.upper() == 'S':
-            tela_lanche()
+            print('Por favor, digite os lanches que você deseja comprar pelo número do id, um de cada vez:')
+            print('Caso não deseje mais nenhum lanche, digite E')
+            tela_lanche(tabelas)
 
         print('Obrigado pela compra, você gostaria de realizar outra? S ou N')
         flag_yes = input()
@@ -144,6 +167,25 @@ if __name__ == '__main__':
     tabelas['ingresso'] = TicketTable()
     tabelas['compra'] = PurchaseTable()
     tabelas['voucher'] = VoucherTable()
+
+    tabelas['produtora'].create('20th Century Studios')
+    tabelas['produtora'].create('Disney')
+    tabelas['produtora'].con.commit()
+    tabelas['produtora'].con.close()
+    tabelas['ator'].create('Macaulin Culkin')
+    tabelas['ator'].create('Joe Pesci')
+    tabelas['ator'].create('Daniel Stern')
+    tabelas['ator'].con.commit()
+    tabelas['ator'].con.close()
+    tabelas['filme'].create('Esqueceram de mim', 'Comédia', 60*1 + 43, 'L', False, 1, [1, 2, 3])
+    tabelas['filme'].con.commit()
+    tabelas['filme'].con.close()
+    tabelas['sala'].create(200)
+    tabelas['sala'].con.commit()
+    tabelas['sala'].con.close()
+    tabelas['programacao'].create(1, 1, '12:00:00', '2022-12-05', '2022-12-20')
+    tabelas['programacao'].con.commit()
+    tabelas['programacao'].con.close()
 
     while(True):
         print('Bem-vindo(a) ao cinema nome do cinema! Você gostaria de ir para a tela de cadastro ou fazer uma compra?')

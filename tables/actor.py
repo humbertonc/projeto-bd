@@ -15,7 +15,7 @@ class ActorTable:
     def create(self, name):
 
         try:
-            self.cur(f"INSERT INTO ator(nome_ator) VALUES({name})")
+            self.cur.execute(f"INSERT INTO ator(nome_ator) VALUES('{name}')")
             print(f"Ator cadastrado com sucesso")
         except:
             print("Não foi possível cadastrar o ator")
@@ -23,12 +23,12 @@ class ActorTable:
 
     def get_id(self, name):
 
-        data = self.cur.execute(f"SELECT id_ator FROM ator WHERE nome_ator == {name}")
+        data = self.cur.execute(f"SELECT id_ator FROM ator WHERE nome_ator == '{name}'")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum ator encontrado com nome {name}\n")
         else:
-            return ret_vals
+            return ret_vals[0][0]
             
 '''
 # Testando criação

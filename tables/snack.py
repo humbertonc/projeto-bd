@@ -23,10 +23,10 @@ class SnackTable:
     def create(self, price, name):
 
         try:
-            self.cur(f"INSERT INTO produto(cod_produto, preco) VALUES(2, {price})")
-            id_product = self.cur("SELECT SCOPE_IDENTITY();")
+            self.cur.execute(f"INSERT INTO produto(cod_produto, preco) VALUES(2, {price})")
+            id_product = self.cur.execute("SELECT last_insert_rowid();").fetchall()[0][0]
             self.cur.execute(f"""INSERT INTO lanche(id_produto, nome_lanche) 
-            VALUES({id_product}, {name})""")
+            VALUES({id_product}, '{name}')""")
             print(f"Lanche cadastrado com sucesso")
         except:
             print("Não foi possível cadastrar o lanche")
@@ -34,8 +34,8 @@ class SnackTable:
 
     def read(self, name):
 
-        data = self.cur.execute(f"""SELECT (id_produto, nome_lanche, preco) 
-        FROM (produto JOIN lanche) WHERE nome_lanche == {name}""")
+        data = self.cur.execute(f"""SELECT produto.id_produto, nome_lanche, preco 
+        FROM produto, lanche WHERE produto.id_produto == lanche.id_produto AND nome_lanche == '{name}'""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum lanche encontrado com nome {name}\n")
@@ -45,7 +45,7 @@ class SnackTable:
             return ret_vals
 
     def read_all(self):
-        data = self.cur.execute(f"SELECT (id_produto, nome_lanche, preco) FROM (produto JOIN lanche)")
+        data = self.cur.execute(f"SELECT produto.id_produto, nome_lanche, preco FROM produto, lanche WHERE produto.id_produto == lanche.id_produto")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum lanche encontrado")
@@ -54,17 +54,17 @@ class SnackTable:
                 print(f"ID: {row[0]}; Nome do produto: {row[1]}; Preço do produto: R${row[2]}")
         print('')
         
-'''
+'''table = SnackTable()
 # Testando criação
 table.create(11.50, 'pão de queijo')
 table.create(9.00, 'pipoca pequena')
+table.create(3.00, 'jujuba')
 
 # Testando leitura
 table.read('pão de queijo')
 table.read('pipoca grande')
 table.read('pipoca pequena')
 table.read_all()
-'''
 
 #table.con.commit()
-#table.con.close()
+table.con.close()'''

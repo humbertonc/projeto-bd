@@ -6,6 +6,20 @@ class VoucherTable:
         self.con = sl.connect('cinema_data.db')
         self.cur = self.con.cursor()
         self.cur.execute("""
+        CREATE TABLE if not exists produto (
+            id_produto integer PRIMARY KEY autoincrement NOT NULL,
+            cod_produto integer NOT NULL,
+            preco numeric(7,2) NOT NULL
+        )
+        """)
+        self.cur.execute("""
+        CREATE TABLE if not exists lanche (
+            id_produto integer,
+            nome_lanche varchar(90) NOT NULL,
+            FOREIGN KEY (id_produto) REFERENCES produto (id_produto)
+        )
+        """)
+        self.cur.execute("""
         CREATE TABLE if not exists voucher (
             id_voucher integer NOT NULL,
             id_produto integer NOT NULL,
@@ -18,7 +32,7 @@ class VoucherTable:
     def create(self, id_voucher, id_product, quantity):
 
         try:
-            self.cur(f"""INSERT INTO voucher(id_voucher, id_produto, quantidade) 
+            self.cur.execute(f"""INSERT INTO voucher(id_voucher, id_produto, quantidade) 
             VALUES({id_voucher}, {id_product}, {quantity})""")
             print(f"Voucher gerado com sucesso")
         except:
@@ -27,8 +41,9 @@ class VoucherTable:
 
     def read(self, id_voucher):
 
-        data = self.cur.execute(f"""SELECT (nome_lanche, quantidade, preco) 
-        FROM (produto JOIN lanche JOIN voucher) WHERE id_voucher == {id_voucher}""")
+        data = self.cur.execute(f"""SELECT nome_lanche, quantidade, preco 
+        FROM produto, lanche, voucher WHERE produto.id_produto == lanche.id_produto AND
+        lanche.id_produto == voucher.id_produto AND id_voucher == {id_voucher}""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum voucher encontrado com id {id_voucher}")
@@ -38,8 +53,8 @@ class VoucherTable:
         print('')
 
     def read_all(self):
-        data = self.cur.execute(f"""SELECT (id_voucher, nome_lanche, quantidade, preco) 
-        FROM (produto JOIN lanche JOIN voucher)""")
+        data = self.cur.execute(f"""SELECT id_voucher, nome_lanche, quantidade, preco 
+        FROM produto, lanche, voucher WHERE produto.id_produto == lanche.id_produto AND lanche.id_produto == voucher.id_produto""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum voucher encontrado")
@@ -49,7 +64,7 @@ class VoucherTable:
         print('')
 
     def read_last(self):
-        data = self.cur.execute(f"SELECT (MAX(id_voucher), id_produto, quantidade) FROM voucher")
+        data = self.cur.execute(f"SELECT MAX(id_voucher), id_produto, quantidade FROM voucher")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhum voucher encontrado")
@@ -58,14 +73,16 @@ class VoucherTable:
         
 '''
 # Testando criação
+table = VoucherTable()
+table.cur.execute(f"INSERT INTO produtora(nome_produtora) VALUES('produtora')")
 table.create(1, 1, 2)
 table.create(1, 2, 4)
 
 # Testando leitura
 table.read(1)
 table.read_all()
-print(read_last())
-'''
+#print(read_last())
+
 
 #table.con.commit()
-#table.con.close()
+table.con.close()'''

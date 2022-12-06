@@ -1,5 +1,5 @@
 import sqlite3 as sl
-from movie import MovieTable
+from tables.movie import MovieTable
 import time
 
 class ScheduleTable:
