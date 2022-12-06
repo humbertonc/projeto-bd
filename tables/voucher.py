@@ -8,7 +8,7 @@ class VoucherTable:
         self.cur.execute("""
         CREATE TABLE if not exists voucher (
             id_voucher integer NOT NULL,
-            id_produto integer,
+            id_produto integer NOT NULL,
             quantidade integer NOT NULL,
             FOREIGN KEY (id_produto) REFERENCES lanche (id_produto),
             CONSTRAINT id_voucher_comp PRIMARY KEY (id_voucher, id_produto)
@@ -34,7 +34,7 @@ class VoucherTable:
             print(f"Nenhum voucher encontrado com id {id_voucher}")
         else:
             for row in ret_vals:
-                print(f"Nome do produto: {row[0]}; Quantidade do produto: {row[1]}; Preço do produto: {row[2]}")
+                print(f"Nome do produto: {row[0]}; Quantidade do produto: {row[1]}; Preço do produto: R${row[2]}")
         print('')
 
     def read_all(self):
@@ -45,7 +45,7 @@ class VoucherTable:
             print(f"Nenhum voucher encontrado")
         else:
             for row in ret_vals:
-                print(f"ID: {row[0]}; Nome do produto: {row[1]}; Quantidade do produto: {row[2]}; Preço do produto: {row[3]}")
+                print(f"ID: {row[0]}; Nome do produto: {row[1]}; Quantidade do produto: {row[2]}; Preço do produto: R${row[3]}")
         print('')
 
     def read_last(self):
