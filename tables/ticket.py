@@ -26,12 +26,19 @@ class TicketTable:
     def create(self, price, id_session, date, type):
 
         try:
-            self.cur.execute(f"INSERT INTO produto(cod_produto, preco) VALUES(1, {price})")
-            id_product = self.cur.execute("SELECT last_insert_rowid();").fetchall()[0][0]
-            self.cur.execute(f"""INSERT INTO ingresso(id_produto, id_sessao, data_sessao, tipo_ingresso) 
-            VALUES({id_product}, {id_session}, '{date}', '{type}')""")
-            print(f"Ingresso gerado com sucesso")
-            return id_product
+            tickets_sold = self.cur.execute(f"""COUNT(id_produto) FROM ingresso 
+            WHERE id_sessao == {id_session} AND data == {date}""").fetchall()[0][0]
+            session_capacity = self.cur.execute(f"""SELECT capacidade FROM sala, programacao
+            WHERE sala.id_sala == programacao.id_sala AND id_sessao == {id_session}""").fetchall()[0][0]
+            if tickets_sold < session_capacity:
+                self.cur.execute(f"INSERT INTO produto(cod_produto, preco) VALUES(1, {price})")
+                id_product = self.cur.execute("SELECT last_insert_rowid();").fetchall()[0][0]
+                self.cur.execute(f"""INSERT INTO ingresso(id_produto, id_sessao, data_sessao, tipo_ingresso) 
+                VALUES({id_product}, {id_session}, '{date}', '{type}')""")
+                print(f"Ingresso gerado com sucesso")
+                return id_product
+            else:
+                print("Sessão esgotada, não foi possível gerar o ingresso")
         except:
             print("Não foi possível gerar o ingresso")
         print('')
