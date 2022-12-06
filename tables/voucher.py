@@ -18,11 +18,11 @@ class VoucherTable:
 
     def create(self, id_voucher, id_product, quantity):
 
-        #try:
-        self.cur.execute(f"""INSERT INTO voucher(id_voucher, id_produto, quantidade) 
-        VALUES({id_voucher}, {id_product}, {quantity})""")
-        #except:
-        #    print("Não foi possível gerar o voucher")
+        try:
+            self.cur.execute(f"""INSERT INTO voucher(id_voucher, id_produto, quantidade) 
+            VALUES({id_voucher}, {id_product}, {quantity})""")
+        except:
+            print("Não foi possível gerar o voucher")
         print('')
 
     def read(self, id_voucher):

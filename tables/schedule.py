@@ -33,7 +33,7 @@ class ScheduleTable:
     def read_by_id(self, id_session, movie_table : MovieTable):
 
         data = self.cur.execute(f"""SELECT id_filme, id_sala, horario, data_inicio, data_fim
-        FROM (programacao) WHERE id_sessao == {id_session}""")
+        FROM programacao WHERE id_sessao == {id_session}""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhuma sessão encontrada com id {id_session}")
@@ -43,13 +43,14 @@ class ScheduleTable:
             for row in ret_vals:
                 movie_table.read(row[0])
                 print(f"Sala: {row[1]}; Horário: {row[2]}; Data de estreia: {row[3]}; Fim da sessão: {row[4]}")
+                #print('')
             movie_table.con.close()
-        print("")
+        #print("")
 
     def read_by_date(self, date, movie_table : MovieTable):
 
         data = self.cur.execute(f"""SELECT id_filme, id_sala, horario, data_inicio, data_fim, id_sessao
-        FROM (programacao) WHERE '{date}' between data_inicio AND data_fim""")
+        FROM programacao WHERE '{date}' between data_inicio AND data_fim""")
         ret_vals = data.fetchall()
         if not ret_vals:
             print(f"Nenhuma sessão encontrada na data {date}")
@@ -59,6 +60,7 @@ class ScheduleTable:
             for row in ret_vals:
                 movie_table.read(row[0])
                 print(f"ID: {row[5]}; Sala: {row[1]}; Horário: {row[2]}; Data de estreia: {row[3]}; Fim da sessão: {row[4]}")
+                print('')
             movie_table.con.close()
         print("")
 
@@ -74,6 +76,7 @@ class ScheduleTable:
             for row in ret_vals:
                 movie_table.read(row[1])
                 print(f"ID: {row[0]}; Sala: {row[2]}; Horário: {row[3]}; Data de estreia: {row[4]}; Fim da sessão: {row[5]}")
+                print('')
             movie_table.con.close()
         print("")
         

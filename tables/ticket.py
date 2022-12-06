@@ -55,6 +55,7 @@ class TicketTable:
             for row in ret_vals:
                 print(f"ID da sessão: {row[0]}; Data da sessão: {row[1]}; Tipo de ingresso: {row[2]}; Preço: R${row[3]}")
         print('')
+        return row[0]
 
     def read_all(self):
         data = self.cur.execute(f"""SELECT produto.id_produto, id_sessao, data_sessao, tipo_ingresso, preco 

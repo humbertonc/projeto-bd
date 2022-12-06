@@ -13,7 +13,7 @@ class MovieTable:
             titulo varchar(90) NOT NULL,
             categoria varchar(90) NOT NULL,
             duracao integer NOT NULL,
-            censura char NOT NULL,
+            censura varchar(5) NOT NULL,
             nacional BOOLEAN
         )
         """)
@@ -36,19 +36,19 @@ class MovieTable:
 
     def create(self, title, genre, duration, rating, national, id_producer, ids_actors):
 
-        #try:
-        self.cur.execute(f"""INSERT INTO filme (titulo, categoria, duracao, censura, nacional) 
-        VALUES('{title}', '{genre}', {duration}, '{rating}', {national})""")
-        id_movie = self.cur.execute("SELECT last_insert_rowid();").fetchall()[0][0]
-        
-        self.cur.execute(f"""INSERT INTO filme_produtora(id_filme, id_produtora) 
-        VALUES({id_movie}, {id_producer})""")
-        for id_actor in ids_actors:
-            self.cur.execute(f"""INSERT INTO filme_ator(id_filme, id_ator) 
-            VALUES({id_movie}, {id_actor})""")
-        print(f"Filme cadastrado com sucesso")
-        #except:
-        #    print("Não foi possível cadastrar o filme")
+        try:
+            self.cur.execute(f"""INSERT INTO filme (titulo, categoria, duracao, censura, nacional) 
+            VALUES('{title}', '{genre}', {duration}, '{rating}', {national})""")
+            id_movie = self.cur.execute("SELECT last_insert_rowid();").fetchall()[0][0]
+            
+            self.cur.execute(f"""INSERT INTO filme_produtora(id_filme, id_produtora) 
+            VALUES({id_movie}, {id_producer})""")
+            for id_actor in ids_actors:
+                self.cur.execute(f"""INSERT INTO filme_ator(id_filme, id_ator) 
+                VALUES({id_movie}, {id_actor})""")
+            print(f"Filme cadastrado com sucesso")
+        except:
+            print("Não foi possível cadastrar o filme")
         print('')
 
     def read(self, id_movie):

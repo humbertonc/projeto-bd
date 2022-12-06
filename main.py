@@ -14,6 +14,31 @@ import pandas as pd
 
 id_voucher = 1
 
+def mostrar_comprovantes(tabelas,id_cliente,ids_compras,id_voucher):
+    tabelas['ingresso'].con = sl.connect('cinema_data.db')
+    tabelas['ingresso'].cur = tabelas['ingresso'].con.cursor()
+    tabelas['programacao'].con = sl.connect('cinema_data.db')
+    tabelas['programacao'].cur = tabelas['programacao'].con.cursor()
+    print("Ingressos:")
+    for i in ids_compras:
+        print('=========================================')
+        sess = tabelas['ingresso'].read(i)
+        tabelas['programacao'].read_by_id(sess,tabelas['filme'])
+    print('=========================================')
+    tabelas['ingresso'].con.commit()
+    tabelas['ingresso'].con.close()
+    tabelas['programacao'].con.commit()
+    tabelas['programacao'].con.close()
+
+    if id_voucher:
+        tabelas['voucher'].con = sl.connect('cinema_data.db')
+        tabelas['voucher'].cur = tabelas['voucher'].con.cursor()
+        print('Comprovante do lanche:')
+        tabelas['voucher'].read(id_voucher)
+        tabelas['voucher'].con.commit()
+        tabelas['voucher'].con.close()
+
+
 def retornar(tabela):
     print('Aperte C para voltar para tela de cadastro e V para voltar para a tela inicial:')
     flag_voltar = input()
@@ -43,7 +68,7 @@ def tela_login(tabela):
 
 def mostrar_filmes(data, tabelas):
     
-    print('Por favor, digite a sessão que você deseja comprar pelo número do id:')
+    print('\nPor favor, digite a sessão que você deseja comprar pelo número do id:')
     tabelas['programacao'].con = sl.connect('cinema_data.db')
     tabelas['programacao'].cur = tabelas['programacao'].con.cursor()
     tabelas['programacao'].read_by_date(data, tabelas['filme'])
@@ -168,9 +193,8 @@ def tela_cadastro(tabela):
 
 def tela_compra(id_cliente, tabelas):
     
+    ids_compras = []
     while(True):
-        
-        ids_compras = []
 
         print('Bem-vindo(a) à tela de compra, você gostaria de fazer uma compra antecipada? S para sim ou N para não')
         antecipada_in = input()
@@ -185,6 +209,7 @@ def tela_compra(id_cliente, tabelas):
         d_semana = pd.to_datetime(f"{ano}-{mes}-{dia}").day_name()
         preco_dict = {'Monday': 15, 'Tuesday': 18, 'Wednesday': 12, 'Thursday': 18, 'Friday': 20, 'Saturday': 23, 'Sunday': 20}
         preco = (1 + 0.1*(antecipada_in.upper() == 'S'))*preco_dict[d_semana]
+        preco = round(preco,2)
 
         id_sessao = mostrar_filmes(f"{ano}-{mes}-{dia}",tabelas)
 
@@ -221,6 +246,7 @@ def tela_compra(id_cliente, tabelas):
         print('Você gostaria de comprar um lanche junto a compra do ingresso? S para sim ou N para não')
         flag_confirmar = input()
 
+        ids_ingressos = ids_compras.copy()
         if flag_confirmar.upper() == 'S':
             print('Por favor, digite os lanches que você deseja comprar pelo número do id, um de cada vez:')
             print('Caso não deseje mais nenhum lanche, digite 0')
@@ -230,6 +256,7 @@ def tela_compra(id_cliente, tabelas):
             id_voucher=None
 
         tela_pagamento(tabelas, id_cliente, ids_compras, id_voucher, antecipada)
+        mostrar_comprovantes(tabelas,id_cliente,ids_ingressos,id_voucher)
 
         print('Obrigado pela preferência, você será redirecionado(a) para o menu principal!')
         print('')
@@ -250,29 +277,6 @@ if __name__ == '__main__':
     tabelas['ingresso'] = TicketTable()
     tabelas['compra'] = PurchaseTable()
     tabelas['voucher'] = VoucherTable()
-
-    tabelas['produtora'].create('20th Century Studios')
-    tabelas['produtora'].create('Disney')
-    tabelas['produtora'].con.commit()
-    tabelas['produtora'].con.close()
-    tabelas['ator'].create('Macaulin Culkin')
-    tabelas['ator'].create('Joe Pesci')
-    tabelas['ator'].create('Daniel Stern')
-    tabelas['ator'].con.commit()
-    tabelas['ator'].con.close()
-    tabelas['filme'].create('Esqueceram de mim', 'Comédia', 60*1 + 43, 'L', False, 1, [1, 2, 3])
-    tabelas['filme'].con.commit()
-    tabelas['filme'].con.close()
-    tabelas['sala'].create(3)
-    tabelas['sala'].con.commit()
-    tabelas['sala'].con.close()
-    tabelas['programacao'].create(1, 1, '12:00:00', '2022-12-05', '2022-12-20')
-    tabelas['programacao'].con.commit()
-    tabelas['programacao'].con.close()
-    tabelas['lanche'].create(12,'biscoito')
-    tabelas['lanche'].create(15,'bolacha')
-    tabelas['lanche'].con.commit()
-    tabelas['lanche'].con.close()
 
     while(True):
         print('Bem-vindo(a) ao Cinema Sauro! Você gostaria de ir para a tela de cadastro ou fazer login?')

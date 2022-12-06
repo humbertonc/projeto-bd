@@ -33,19 +33,19 @@ class PurchaseTable:
 
     def create(self, id_client, form_of_payment, date, ids_products, id_voucher = None):
 
-        #try:
-        self.cur.execute(f"""INSERT INTO compra(id_cliente, forma_de_pagamento, data_compra) 
-        VALUES({id_client}, '{form_of_payment}', '{date}')""")
-        id_purchase = self.cur.execute("SELECT last_insert_rowid();").fetchall()[0][0]
-        for id_product in ids_products:
-            self.cur.execute(f"""INSERT INTO compra_produto(id_compra, id_produto) 
-            VALUES({id_purchase}, {id_product})""")
-        if id_voucher != None:
-            self.cur.execute(f"INSERT INTO compra_voucher(id_compra, id_voucher) VALUES('{id_purchase}', '{id_voucher}')")
-        print(f"Compra cadastrada com sucesso")
-        return id_purchase
-        #except:
-        #    print("Não foi possível cadastrar a compra")
+        try:
+            self.cur.execute(f"""INSERT INTO compra(id_cliente, forma_de_pagamento, data_compra) 
+            VALUES({id_client}, '{form_of_payment}', '{date}')""")
+            id_purchase = self.cur.execute("SELECT last_insert_rowid();").fetchall()[0][0]
+            for id_product in ids_products:
+                self.cur.execute(f"""INSERT INTO compra_produto(id_compra, id_produto) 
+                VALUES({id_purchase}, {id_product})""")
+            if id_voucher != None:
+                self.cur.execute(f"INSERT INTO compra_voucher(id_compra, id_voucher) VALUES('{id_purchase}', '{id_voucher}')")
+            print(f"Compra cadastrada com sucesso")
+            return id_purchase
+        except:
+            print("Não foi possível cadastrar a compra")
         print('')
 
     def read_by_id(self, id_purchase):
