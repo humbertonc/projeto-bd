@@ -83,18 +83,23 @@ def tela_lanche(tabelas):
     
     return list_unique_id, id_voucher - 1
 
-def tela_pagamento(tabelas, id_cliente, ids_compras, id_voucher):
+def tela_pagamento(tabelas, id_cliente, ids_compras, id_voucher, antecipado):
 
     while(True):
-        print('Por favor, digite como será a forma de pagamento da compra: (C) crédito; (D) débito; (E) espécie; (P) pix')
-        forma_pagamento_char = input().upper()
+        forma_pagamento = 'CREDITO'
+        
+        if not antecipado:
+            print('Por favor, digite como será a forma de pagamento da compra: (C) crédito; (D) débito; (E) espécie; (P) pix')
+            forma_pagamento_char = input().upper()
 
-        forma_dict = {'C': 'CREDITO', 'D': 'DEBITO', 'E':'ESPECIE','P':'PIX'}
-        if forma_pagamento_char not in forma_dict:
-            print("Forma inválida. Digite novamente.")
-            continue
+            forma_dict = {'C': 'CREDITO', 'D': 'DEBITO', 'E':'ESPECIE','P':'PIX'}
+            if forma_pagamento_char not in forma_dict:
+                print("Forma inválida. Digite novamente.")
+                continue
 
-        id_compra = tabelas['compra'].create(id_cliente, forma_dict[forma_pagamento_char], date.today(), ids_compras, id_voucher)
+            forma_pagamento = forma_dict[forma_pagamento_char]
+
+        id_compra = tabelas['compra'].create(id_cliente, forma_pagamento, date.today(), ids_compras, id_voucher)
         tabelas['compra'].read_by_id(id_compra)
         tabelas['compra'].con.commit()
         tabelas['compra'].con.close()
@@ -168,16 +173,18 @@ def tela_compra(id_cliente, tabelas):
         ids_compras = []
 
         print('Bem-vindo(a) à tela de compra, você gostaria de fazer uma compra antecipada? S para sim ou N para não')
-        antecipada = input()
+        antecipada_in = input()
+        antecipada = False
         data = date.today().strftime("%d/%m/%Y")
-        if antecipada.upper() == 'S':
+        if antecipada_in.upper() == 'S':
+            antecipada = True
             print('Para que dia será sua compra? Digite o dia do mês, seguido do mês e do ano no formato dd/mm/yyyy')
             data = input()
 
         dia, mes, ano = data.split('/')
         d_semana = pd.to_datetime(f"{ano}-{mes}-{dia}").day_name()
         preco_dict = {'Monday': 15, 'Tuesday': 18, 'Wednesday': 12, 'Thursday': 18, 'Friday': 20, 'Saturday': 23, 'Sunday': 20}
-        preco = (1 + 0.1*(antecipada.upper() == 'S'))*preco_dict[d_semana]
+        preco = (1 + 0.1*(antecipada_in.upper() == 'S'))*preco_dict[d_semana]
 
         id_sessao = mostrar_filmes(f"{ano}-{mes}-{dia}",tabelas)
 
@@ -222,7 +229,7 @@ def tela_compra(id_cliente, tabelas):
         else:
             id_voucher=None
 
-        tela_pagamento(tabelas, id_cliente, ids_compras, id_voucher)
+        tela_pagamento(tabelas, id_cliente, ids_compras, id_voucher, antecipada)
 
         print('Obrigado pela preferência, você será redirecionado(a) para o menu principal!')
         print('')
