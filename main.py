@@ -54,7 +54,7 @@ def tela_login(tabela):
     tabela.cur = tabela.con.cursor()
     print('Por favor digite seu nome para fazer login')
     nome = input()
-    ret_read = tabela.read(nome)
+    ret_read = tabela.get_id_by_name(nome)
 
     if ret_read >= 0:
         tabela.con.commit()
